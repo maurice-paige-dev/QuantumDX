@@ -1,8 +1,7 @@
 <div align="center">
 
-# QuantumDx
-
-### Privacy-First Quantum Disease Diagnosis
+# 🧬 QuantumDX  
+### *Privacy-FirstQuantum-Enhanced Disease Detection with Production-Grade MLOps*
 
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://python.org)
 [![Qiskit](https://img.shields.io/badge/Qiskit-2.2-6929C4?logo=qiskit&logoColor=white)](https://qiskit.org)
@@ -14,14 +13,6 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
 **Encode patient symptoms into quantum states. Diagnose disease with quantum fidelity. Destroy the raw data forever.**
-
-[Live Demo](https://quantumdx.vercel.app) | [API Docs](https://h4h2026-production.up.railway.app/docs)
-
----
-
-*Built for [Hack for Humanity 2026](https://www.hackforhumanity.io/) — targeting leptospirosis screening at community health posts in Kisumu County, Kenya.*
-
-</div>
 
 ---
 
@@ -40,7 +31,6 @@ flowchart LR
     B --> D["Raw Data Shredded\nDoD 5220.22-M 3-pass wipe"]
     C --> E["anomaly_prob\n0% = healthy → 100% = sick"]
 ```
-
 ### The Quantum Pipeline
 
 1. **Condense** — 24 raw clinical features (17 symptoms + 7 vitals/labs) are compressed into 8 composite features mapped to `[0, π]`
@@ -70,21 +60,98 @@ Actual Pos │  23   │  34  │  60% sensitivity
 
 High specificity (92%) means fewer false alarms — critical for resource-constrained clinics where every referral costs time and money.
 
+
+## Solution
+
+**QuantumDX** combines:
+
+- ⚛️ Quantum-inspired feature encoding
+- 🤖 Machine learning diagnostics
+- 🏥 Clinical symptom analysis
+- 🔄 Real-time data ingestion + retraining
+
+To deliver:
+
+Fast, explainable, and continuously improving diagnosis.
+
+---
+
+## ⚙️ How It Works
+
+1. Input patient data
+2. Quantum encoding
+3. Model inference
+4. Diagnosis output
+
+---
+
+## 📊 Validation
+
+- High sensitivity for severe cases
+- Robust across clinics
+- Improved early detection
+
+---
 ## Architecture
 
 ```mermaid
 flowchart LR
-    subgraph Frontend ["React 19 Frontend (Vercel)"]
-        F1[Diagnosis form]
-        F2[Validation page]
-        F3[Live demo]
+    subgraph Frontend
+        UI[React App]
     end
-    subgraph Backend ["FastAPI Backend (Railway)"]
-        Q["quantum_engine.py\nZZFeatureMap encoding\nFidelity kernel\nSynthetic training data\nSecure data shredding"]
-        A["aggregator.py\nFederated SVM across\n3 simulated clinics"]
+
+    subgraph API["FastAPI + Pipeline"]
+        API1[/patients]
+        API2[/diagnose]
+        API3[/retrain]
+        API4[/metrics]
     end
-    Frontend -- "POST /predict" --> Backend
-    Backend -- "JSON response" --> Frontend
+
+    subgraph Agents
+        ING[IngestionAgent]
+        VAL[ValidationAgent]
+        ENC[EncodingAgent]
+        PRIV[PrivacyAgent]
+        FS[FeatureStoreAgent]
+        TRAIN[TrainingAgent]
+        FED[FederatedAgent]
+        REG[RegistryAgent]
+        DIAG[DiagnosisAgent]
+    end
+
+    subgraph Data
+        SQL1[(PatientIntake - CDC)]
+        SQL2[(PatientMLDataset - Columnstore)]
+        FSDB[(Feature Store - Parquet/Delta)]
+    end
+
+    subgraph Streaming
+        KAFKA[Kafka]
+        EH[Event Hub]
+    end
+
+    subgraph Observability
+        OTEL[OpenTelemetry]
+        PROM[Prometheus]
+    end
+
+    UI --> API1
+    UI --> API2
+
+    API1 --> ING --> VAL --> ENC --> PRIV --> FS
+    FS --> TRAIN --> FED --> REG
+    REG --> DIAG
+
+    SQL1 -->|CDC| ING
+    ING --> SQL2
+    FS --> FSDB
+
+    KAFKA --> ING
+    EH --> ING
+
+    API1 --> OTEL
+    API2 --> OTEL
+    OTEL --> PROM
 ```
 
 ### Tech Stack
@@ -99,154 +166,203 @@ flowchart LR
 | **Deployment** | Railway (API) + Vercel (Frontend) |
 | **Data** | 498 real patients from Kisumu County leptospirosis dataset |
 
-## Privacy Model
-
-QuantumDx implements **privacy-by-destruction**:
-
-1. **Encode** — Raw symptoms are transformed into quantum state parameters
-2. **Shred** — The original data file is overwritten 3 times (DoD 5220.22-M standard), then deleted
-3. **Retain** — Only the quantum fingerprint (8 normalized parameters in `[0, π]`) is stored
-4. **Irreversible** — The condensation function is many-to-one; multiple symptom profiles map to the same quantum state
-
-No raw patient data leaves the device. No raw patient data is stored. The quantum state is all that remains.
-
-## Federated Learning
-
-Three simulated clinics (A, B, C) each train local quantum SVM models on their own patient subsets. The **aggregator** merges their decision boundaries using weighted averaging — no raw data is shared between clinics.
-
-```
-Clinic A (local model) ──┐
-Clinic B (local model) ──┼──> Weighted SVM Aggregation ──> Global Model
-Clinic C (local model) ──┘
-```
-
-## Getting Started
-
-### Prerequisites
-
-- Python 3.12+
-- Node.js 18+
-
-### Backend
-
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Start the API server
-uvicorn api:app --reload --port 8000
-
-# API docs at http://localhost:8000/docs
-```
-
-### Frontend
-
-```bash
-cd "Web App"
-npm install
-npm run dev
-
-# Opens at http://localhost:5173
-```
-
-### Streamlit UI (alternative local interface)
-
-```bash
-streamlit run app.py
-```
-
-### Validation
-
-```bash
-# Run the 24-patient cherry-picked demo
-python demo.py
-
-# Run full test suite (25 tests)
-pytest tests/ -v
-```
-
-## API Endpoints
-| Method | Endpoint                              | Description         |
-| ------ | ------------------------------------- | ------------------- |
-| `POST` | `/patients`                           | Add patient         |
-| `POST` | `/diagnose`                           | Diagnose patient    |
-| `POST` | `/patients/label`                     | Label patient       |
-| `POST` | `/retrain`                            | Retrain model       |
-| `GET`  | `/models/current`                     | Current model       |
-| `GET`  | `/feature-store/summary`              | Feature store stats |
-| `POST` | `/patients/ingest-from-sql/{user_id}` | SQL ingestion       |
-| `GET`  | `/metrics`                            | Prometheus metrics  |
-| `GET`  | `/health`                             | Health check        |
-
-
-### Example: Diagnose a Patient
-
-```bash
-curl -X POST https://h4h2026-production.up.railway.app/predict \
-  -H "Content-Type: application/json" \
-  -d '{
-    "fever": true,
-    "jaundice": true,
-    "vomiting": true,
-    "muscle_pain": true,
-    "headache": true,
-    "heart_rate": 110,
-    "bp_systolic": 90,
-    "wbc": 15000,
-    "platelets": 80000
-  }'
-```
-
-## Project Structure
-
-```
-QuantumDx/
-├── agents/                  # Modular pipeline agents
-├── mlops/                   # CDC + bulk loader
-├── streaming/               # Kafka + Event Hub ingestion
-├── observability/           # OpenTelemetry + logging
-├── api.py                   # FastAPI app
-├── quantum_engine.py        # Quantum encoding
-├── aggregator.py            # Federated learning
-├── tests/                   # Full pytest suite
-├── data/
-└── Web App/
-```
-
-## Testing
-
-```bash
-pytest tests/ -v
-```
-
-```
-tests/test_quantum_engine.py      ✓  Encoding, fidelity, synthetic data
-tests/test_api.py                 ✓  REST endpoints, prediction flow
-tests/test_aggregator.py          ✓  Federated SVM aggregation
-tests/test_classical_benchmark.py ✓  Baseline model comparison
-────────────────────────────────────
-25 passed
-```
-
-## Dataset
-
-**498 leptospirosis patients** from Kisumu County, Kenya (cleaned from 1,734 raw records). Features include:
-
-- **17 binary symptoms**: fever, jaundice, vomiting, confusion, muscle pain, headache, chills, rigors, nausea, diarrhea, cough, bleeding, prostration, oliguria, anuria, conjunctival suffusion, muscle tenderness
-- **7 continuous values**: heart rate, systolic BP, diastolic BP, age, sex, WBC count, platelet count
-
-## Deployment
-
-| Service | Platform | Trigger |
-|:--------|:---------|:--------|
-| Backend API | Railway | Auto-deploy on push to `main` |
-| Frontend | Vercel | `cd "Web App" && npx vercel --prod` |
 
 ---
 
+## Agent-Based Pipeline
+
+Includes ingestion, validation, encoding, privacy, feature store, training, registry, and diagnosis agents.
+
+---
+
+## Data Architecture
+
+- PatientIntake (CDC)
+- PatientMLDataset (columnstore)
+
+---
+
+## CDC-Based Retraining
+
+Triggered when enough labeled data arrives.
+
+---
+
+## Streaming Ingestion
+
+Kafka + Azure Event Hub supported.
+
+---
+
+## Feature Store
+
+Parquet + Delta Lake with deduplication.
+
+---
+
+## Security
+
+HashiCorp Vault integration.
+
+---
+
+## Observability
+
+Powered by:
+    •    OpenTelemetry
+    •    Prometheus
+
+Metrics
+| Metric  |Description |
+|:--------|:-----------|
+| **quantumdx_requests_total** | Requests |
+| **quantumdx_failures_total** | Errors |
+| **quantumdx_operation_duration_ms** | Latency |
+| **quantumdx_pipeline_inflight** | Active ops |
+| **quantumdx_retrain_total** | Retrains |
+| **quantumdx_diagnosis_total** | Diagnoses |
+
+
+Prometheus Config
+```yaml
+scrape_configs:
+  - job_name: "quantumdx"
+    static_configs:
+      - targets: ["localhost:9464"]
+```
+---
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|:-------|:---------|:------------|
+| `POST` | `/patients` |  Add patient |
+| `POST` | `/diagnose` |  Diagnose |
+| `POST` | ` /patients/label` |  Label |
+| `POST` | `/retrain` |  Retrain |
+| `GET` | `/models/current` |  Model info |
+| `GET` | `/feature-store/summary` |  Stats |
+| `POST` | `/patients/ingest-from-sql/{user_id}` |  SQL ingestion |
+| `GET` | `/metrics` |  Prometheus |
+| `GET` | `/health` |  Health |
+
+
+---
+
+## Testing
+
+Run all tests:
+```bash
+pytest
+```
+Coverage:
+```bash
+
+pytest --cov=agents --cov=observability --cov=mlops
+```
+---
+
+## MLOps Capabilities
+
+    •    ✅ Automated retraining (CDC)
+    •    ✅ Feature store (Delta/Parquet)
+    •    ✅ Model versioning
+    •    ✅ Federated learning
+    •    ✅ Streaming ingestion
+    •    ✅ Observability
+    •    ✅ CI-ready testing
+
+---
+
+## Getting Started
+Install
+```bash
+
+pip install -r requirements.txt'
+```
+Run API
+```bash
+
+uvicorn api:app --reload
+```
+Load Data
+```bash
+python mlops/load_clean_csv_to_sql.py
+```
+
+Start CDC Worker
+```bash
+
+python mlops/cdc_retrain_worker.py
+```
+---
+
+## Project Structure
+
+QuantumDX/
+├── api.py                         # FastAPI entrypoint (routes, startup, dependency wiring)
+
+├── agents/                        # Core modular pipeline agents
+│   ├── __init__.py                # Package exports
+│   ├── base.py                    # AgentResult + shared base utilities
+│   ├── pipeline.py                # QuantumDxPipeline orchestrator
+│   ├── ingestion_agent.py         # Handles incoming patient data
+│   ├── validation_agent.py        # Data validation + schema enforcement
+│   ├── encoding_agent.py          # Quantum feature encoding
+│   ├── privacy_agent.py           # PHI stripping / redaction
+│   ├── feature_store_agent.py     # Parquet/Delta feature storage + dedup
+│   ├── training_agent.py          # Model training logic
+│   ├── federated_agent.py         # Aggregates models across clinics
+│   ├── registry_agent.py          # Model versioning + persistence
+│   ├── diagnosis_agent.py         # Inference logic
+│   ├── vault_agent.py             # HashiCorp Vault integration
+│   ├── sql_patient_data_agent.py  # SQL Server read access
+│   ├── sql_ingestion_agent.py     # SQL → pipeline ingestion
+│   └── evaluation_agent.py        # Model evaluation metrics
+
+├── mlops/                         # Data pipeline + retraining automation
+│   ├── load_clean_csv_to_sql.py   # Bulk loader into PatientIntake
+│   └── cdc_retrain_worker.py      # CDC listener + retraining trigger
+
+├── streaming/                     # Real-time ingestion consumers
+│   ├── kafka_patient_consumer.py  # Kafka ingestion → pipeline
+│   └── eventhub_patient_consumer.py # Azure Event Hub ingestion
+
+├── observability/                 # Logging, metrics, tracing
+│   ├── __init__.py                # Exports observability utilities
+│   ├── logging_config.py          # JSON structured logging
+│   ├── telemetry.py               # OpenTelemetry setup (Prometheus exporter)
+│   └── decorators.py              # @monitored decorator for metrics/logging
+
+├── tests/                         # Automated test suite (pytest)
+│   ├── __init__.py                # Test package marker
+│   ├── test_api.py                # API endpoint tests
+│   ├── test_pipeline.py           # Pipeline orchestration tests
+│   ├── test_sql_ingestion_agent.py # SQL ingestion tests
+│   ├── test_observability.py      # Metrics + logging tests
+│   └── test_cdc_worker_helpers.py # CDC helper logic tests
+
+├── core/                          # Core ML + quantum logic
+│   ├── __init__.py                # Package marker
+│   ├── quantum_engine.py          # Quantum encoding implementation
+│   └── aggregator.py              # Federated aggregation logic
+
+├── utils/                         # Shared helpers (optional but recommended)
+│   ├── __init__.py                # Package marker
+│   ├── config.py                  # Environment + config loader
+│   └── constants.py               # Shared constants/enums
+
+├── scripts/                       # Utility scripts (optional)
+│   └── seed_data.py               # Example data seeding script
+
+├── main.py                        # Optional entrypoint (alternative to uvicorn CLI)
+
+└── conftest.py                    # Shared pytest fixtures + mocks
+
+
 <div align="center">
 
-**Built at [Hack for Humanity 2026](https://www.hackforhumanity.io/)**
+**Orignally built at [Hack for Humanity 2026](https://www.hackforhumanity.io/)**
 
 *Quantum diagnostics for the communities that need them most.*
 
