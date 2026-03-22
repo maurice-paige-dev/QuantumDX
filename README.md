@@ -20,6 +20,8 @@
 
 </div>
 
+---
+
 ## The Problem
 
 In rural Kenya, **leptospirosis** kills through misdiagnosis. Community health workers lack lab infrastructure, and sending patient data to centralized systems creates privacy risks in regions with limited data protection.
@@ -80,7 +82,7 @@ Fast, explainable, and continuously improving diagnosis.
 
 ---
 
-## ⚙️ How It Works
+## How It Works
 
 1. Input patient data
 2. Quantum encoding
@@ -89,7 +91,7 @@ Fast, explainable, and continuously improving diagnosis.
 
 ---
 
-## 📊 Validation
+## Validation
 
 - High sensitivity for severe cases
 - Robust across clinics
@@ -157,6 +159,7 @@ flowchart LR
     API2 --> OTEL
     OTEL --> PROM
 ```
+---
 
 ### Tech Stack
 
@@ -184,6 +187,16 @@ Includes ingestion, validation, encoding, privacy, feature store, training, regi
 - PatientIntake (CDC)
 - PatientMLDataset (columnstore)
 
+## Dataset (Initial Seed Data)
+
+**498 leptospirosis patients** from Kisumu County, Kenya (cleaned from 1,734 raw records). 
+
+Features include:
+
+- **17 binary symptoms**: fever, jaundice, vomiting, confusion, muscle pain, headache, chills, rigors, nausea, diarrhea, cough, bleeding, prostration, oliguria, anuria, conjunctival suffusion, muscle tenderness
+- **7 continuous values**: heart rate, systolic BP, diastolic BP, age, sex, WBC count, platelet count
+
+
 ---
 
 ## CDC-Based Retraining
@@ -206,7 +219,8 @@ Parquet + Delta Lake with deduplication.
 
 ## Security
 
-HashiCorp Vault integration.
+	•	HashiCorp Vault integration
+	•	No credentials stored in code
 
 ---
 
@@ -226,6 +240,7 @@ Metrics
 | **quantumdx_retrain_total** | Retrains |
 | **quantumdx_diagnosis_total** | Diagnoses |
 
+---
 
 Prometheus Config
 ```yaml
@@ -257,6 +272,7 @@ scrape_configs:
 
 Run all tests:
 ```bash
+
 pytest
 ```
 Coverage:
@@ -291,6 +307,7 @@ uvicorn api:app --reload
 ```
 Load Data
 ```bash
+
 python mlops/load_clean_csv_to_sql.py
 ```
 
@@ -363,6 +380,40 @@ QuantumDX/
 
 └── conftest.py                    # Shared pytest fixtures + mocks
 ```
+
+---
+## Deployment
+
+|                  Service                |              Platform            |                Trigger               |                      Notes                    |
+|:---------------------------------------:|:--------------------------------:|:------------------------------------:|:---------------------------------------------:|
+|   Backend API (FastAPI)                 |   Railway                        |   Auto-deploy on push to main        |   Hosts API, pipeline, OpenTelemetry metrics  |
+|   Frontend (React)                      |   Vercel                         |   cd "Web App" && npx vercel --prod  |   UI for diagnosis                            |
+|   CDC Worker                            |   Railway Worker / Cron          |   Scheduled / always-on              |   Runs cdc_retrain_worker.py                  |
+|   Streaming Consumers (Kafka/EventHub)  |   Railway Worker / Container     |   Always-on                          |   Real-time ingestion                         |
+|   SQL Server                            |   Azure SQL / Railway / Docker   |   Managed                            |   Stores PatientIntake + PatientMLDataset     |
+|   Feature Store (Delta/Parquet)         |   Local / S3 / ADLS              |   Mounted / cloud storage            |   Stores encoded features                     |
+|   Prometheus                            |   Docker / Cloud VM              |   Always-on                          |   Scrapes OpenTelemetry metrics               |
+|   Vault (Secrets)                       |   HashiCorp Cloud / Self-hosted  |   Always-on                          |   Secure DB credentials                       |
+
+--
+
+## What Changed
+
+Before
+	•	Quantum encoding demo
+	•	Static ML model
+	•	No pipeline
+
+Now
+	•	Full AI + data platform
+	•	Agent-based architecture
+	•	SQL + CDC ingestion
+	•	Streaming ingestion
+	•	Feature store (Delta Lake)
+	•	Observability (OTel + Prometheus)
+	•	Automated testing
+
+---
 
 <div align="center">
 
