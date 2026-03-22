@@ -14,6 +14,7 @@
 
 **Encode patient symptoms into quantum states. Diagnose disease with quantum fidelity. Destroy the raw data forever.**
 
+</div>
 ---
 
 ## The Problem
