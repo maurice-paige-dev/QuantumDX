@@ -14,8 +14,11 @@
 
 **Encode patient symptoms into quantum states. Diagnose disease with quantum fidelity. Destroy the raw data forever.**
 
-</div>
 ---
+
+* Conceptionalized and built for [Hack for Humanity 2026](https://www.hackforhumanity.io/) — targeting leptospirosis screening at community health posts in Kisumu County, Kenya.*
+
+</div>
 
 ## The Problem
 
@@ -299,7 +302,7 @@ python mlops/cdc_retrain_worker.py
 ---
 
 ## Project Structure
-
+```
 QuantumDX/
 ├── api.py                         # FastAPI entrypoint (routes, startup, dependency wiring)
 
@@ -359,11 +362,11 @@ QuantumDX/
 ├── main.py                        # Optional entrypoint (alternative to uvicorn CLI)
 
 └── conftest.py                    # Shared pytest fixtures + mocks
-
+```
 
 <div align="center">
 
-**Orignally built at [Hack for Humanity 2026](https://www.hackforhumanity.io/)**
+***Forked from https://github.com/MatthiasMasiero/H4H2026
 
 *Quantum diagnostics for the communities that need them most.*
 
