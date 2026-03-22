@@ -102,10 +102,10 @@ flowchart LR
     end
 
     subgraph API["FastAPI + Pipeline"]
-        API1[/patients]
-        API2[/diagnose]
-        API3[/retrain]
-        API4[/metrics]
+        API1[patients]
+        API2[diagnose]
+        API3[retrain]
+        API4[metrics]
     end
 
     subgraph Agents
