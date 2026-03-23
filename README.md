@@ -28,6 +28,8 @@ In rural Kenya, **leptospirosis** kills through misdiagnosis. Community health w
 
 **QuantumDx** solves both problems at once: it uses quantum computing to diagnose disease from symptoms alone, then **permanently destroys** the raw patient data — leaving only a quantum fingerprint that cannot be reverse-engineered.
 
+---
+
 ## How It Works
 
 ```mermaid
@@ -37,6 +39,8 @@ flowchart LR
     B --> D["Raw Data Shredded\nDoD 5220.22-M 3-pass wipe"]
     C --> E["anomaly_prob\n0% = healthy → 100% = sick"]
 ```
+---
+
 ### The Quantum Pipeline
 
 1. **Condense** — 24 raw clinical features (17 symptoms + 7 vitals/labs) are compressed into 8 composite features mapped to `[0, π]`
@@ -66,6 +70,7 @@ Actual Pos │  23   │  34  │  60% sensitivity
 
 High specificity (92%) means fewer false alarms — critical for resource-constrained clinics where every referral costs time and money.
 
+---
 
 ## Solution
 
@@ -82,22 +87,15 @@ Fast, explainable, and continuously improving diagnosis.
 
 ---
 
-## How It Works
-
-1. Input patient data
-2. Quantum encoding
-3. Model inference
-4. Diagnosis output
-
----
-
 ## Validation
 
-- High sensitivity for severe cases
-- Robust across clinics
-- Improved early detection
+•	✔️ High sensitivity for severe cases
+•	✔️ Robust across multiple clinics
+•	✔️ Improved early-stage detection
+
 
 ---
+
 ## Architecture
 
 ```mermaid
@@ -163,29 +161,52 @@ flowchart LR
 
 ### Tech Stack
 
-| Layer | Technology |
-|:------|:-----------|
-| **Quantum Engine** | Qiskit 2.2 (ZZFeatureMap, Statevector) |
-| **Backend API** | FastAPI + Uvicorn |
-| **Frontend** | React 19, TypeScript, Vite, Framer Motion |
-| **ML** | scikit-learn (SVM kernel), NumPy |
-| **Federated Learning** | Custom weighted aggregation across 3 clinics |
-| **Deployment** | Railway (API) + Vercel (Frontend) |
-| **Data** | 498 real patients from Kisumu County leptospirosis dataset |
+|                  Service                |              Platform            |                Trigger               |                      Notes                    |
+|:---------------------------------------:|:--------------------------------:|:------------------------------------:|:---------------------------------------------:|
+|   Backend API (FastAPI)                 |   Railway                        |   Auto-deploy on push to main        |   Hosts API, pipeline, OpenTelemetry metrics  |
+|   Frontend (React)                      |   Vercel                         |   cd "Web App" && npx vercel --prod  |   UI for diagnosis                            |
+|   CDC Worker                            |   Railway Worker / Cron          |   Scheduled / always-on              |   Runs cdc_retrain_worker.py                  |
+|   Streaming Consumers (Kafka/EventHub)  |   Railway Worker / Container     |   Always-on                          |   Real-time ingestion                         |
+|   SQL Server                            |   Azure SQL / Railway / Docker   |   Managed                            |   Stores PatientIntake + PatientMLDataset     |
+|   Feature Store (Delta/Parquet)         |   Local / S3 / ADLS              |   Mounted / cloud storage            |   Stores encoded features                     |
+|   Prometheus                            |   Docker / Cloud VM              |   Always-on                          |   Scrapes OpenTelemetry metrics               |
+|   Vault (Secrets)                       |   HashiCorp Cloud / Self-hosted  |   Always-on                          |   Secure DB credentials                       |
 
 
 ---
 
 ## Agent-Based Pipeline
 
-Includes ingestion, validation, encoding, privacy, feature store, training, registry, and diagnosis agents.
+|         Agent        |                   Role                  |
+|:--------------------:|:---------------------------------------:|
+|   IngestionAgent     |   Accepts data (API / SQL / streaming)  |
+|   ValidationAgent    |   Ensures correctness                   |
+|   EncodingAgent      |   Quantum feature encoding              |
+|   PrivacyAgent       |   Removes PHI                           |
+|   FeatureStoreAgent  |   Stores features                       |
+|   TrainingAgent      |   Trains models                         |
+|   FederatedAgent     |   Aggregates models                     |
+|   RegistryAgent      |   Versioning                            |
+|   DiagnosisAgent     |   Inference                             |
 
 ---
 
 ## Data Architecture
 
-- PatientIntake (CDC)
-- PatientMLDataset (columnstore)
+|         Table       |            Purpose          |
+|:-------------------:|:---------------------------:|
+|   PatientIntake     |   Rowstore + CDC ingestion  |
+|   PatientMLDataset  |   Columnstore analytics     |
+
+
+```mermaid
+flowchart TD
+    A[API / CSV / Streaming] --> B[PatientIntake]
+    B -->|CDC| C[Worker]
+    C --> D[Pipeline]
+    D --> E[Feature Store]
+    D --> F[PatientMLDataset]
+```
 
 ## Dataset (Initial Seed Data)
 
@@ -201,19 +222,54 @@ Features include:
 
 ## CDC-Based Retraining
 
-Triggered when enough labeled data arrives.
+Automatically retrains when enough labeled data arrives:
+
+```text
+New labeled records ≥ threshold → retrain()
+```
+
+Run:
+
+```bash
+python mlops/cdc_retrain_worker.py
+```
 
 ---
 
 ## Streaming Ingestion
 
-Kafka + Azure Event Hub supported.
+Supports real-time pipelines:
+
+Kafka
+
+```bash
+python streaming/kafka_patient_consumer.py
+```
+
+Azure Event Hub
+```bash
+python streaming/eventhub_patient_consumer.py
+```
 
 ---
 
 ## Feature Store
 
-Parquet + Delta Lake with deduplication.
+Supports:
+	•	✅ Parquet (local/dev)
+	•	✅ Delta Lake (production)
+
+Features
+	•	ACID transactions
+	•	Time travel
+	•	Schema evolution
+	•	Deduplication (patient_id + clinic_id)
+
+```bash
+
+FEATURE_STORE_MODE=delta
+FEATURE_STORE_PATH=data/feature_store
+```
 
 ---
 
@@ -231,16 +287,15 @@ Powered by:
     •    Prometheus
 
 Metrics
-| Metric  |Description |
-|:--------|:-----------|
-| **quantumdx_requests_total** | Requests |
-| **quantumdx_failures_total** | Errors |
-| **quantumdx_operation_duration_ms** | Latency |
-| **quantumdx_pipeline_inflight** | Active ops |
-| **quantumdx_retrain_total** | Retrains |
-| **quantumdx_diagnosis_total** | Diagnoses |
+|                Metric              |   Description  |
+|:----------------------------------:|:--------------:|
+|   quantumdx_requests_total         |   Requests     |
+|   quantumdx_failures_total         |   Errors       |
+|   quantumdx_operation_duration_ms  |   Latency      |
+|   quantumdx_pipeline_inflight      |   Active ops   |
+|   quantumdx_retrain_total          |   Retrains     |
+|   quantumdx_diagnosis_total        |   Diagnoses    |
 
----
 
 Prometheus Config
 ```yaml
@@ -253,17 +308,17 @@ scrape_configs:
 
 ## API Endpoints
 
-| Method | Endpoint | Description |
-|:-------|:---------|:------------|
-| `POST` | `/patients` |  Add patient |
-| `POST` | `/diagnose` |  Diagnose |
-| `POST` | ` /patients/label` |  Label |
-| `POST` | `/retrain` |  Retrain |
-| `GET` | `/models/current` |  Model info |
-| `GET` | `/feature-store/summary` |  Stats |
-| `POST` | `/patients/ingest-from-sql/{user_id}` |  SQL ingestion |
-| `GET` | `/metrics` |  Prometheus |
-| `GET` | `/health` |  Health |
+|   Method  |                 Endpoint               |    Description   |
+|:---------:|:--------------------------------------:|:----------------:|
+|   POST    |   /patients                            |   Add patient    |
+|   POST    |   /diagnose                            |   Diagnose       |
+|   POST    |   /patients/label                      |   Label          |
+|   POST    |   /retrain                             |   Retrain        |
+|   GET     |   /models/current                      |   Model info     |
+|   GET     |   /feature-store/summary               |   Stats          |
+|   POST    |   /patients/ingest-from-sql/{user_id}  |   SQL ingestion  |
+|   GET     |   /metrics                             |   Prometheus     |
+|   GET     |   /health                              |   Health         |
 
 
 ---
