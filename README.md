@@ -225,12 +225,15 @@ Features include:
 Automatically retrains when enough labeled data arrives:
 
 ```text
+
 New labeled records ≥ threshold → retrain()
 ```
 
 Run:
 
 ```bash
+bash
+
 python mlops/cdc_retrain_worker.py
 ```
 
@@ -243,11 +246,15 @@ Supports real-time pipelines:
 Kafka
 
 ```bash
+bash
+
 python streaming/kafka_patient_consumer.py
 ```
 
 Azure Event Hub
 ```bash
+bash
+
 python streaming/eventhub_patient_consumer.py
 ```
 
@@ -266,6 +273,7 @@ Features
 	•	Deduplication (patient_id + clinic_id)
 
 ```bash
+bash
 
 FEATURE_STORE_MODE=delta
 FEATURE_STORE_PATH=data/feature_store
@@ -327,11 +335,13 @@ scrape_configs:
 
 Run all tests:
 ```bash
+bash 
 
 pytest
 ```
 Coverage:
 ```bash
+bash
 
 pytest --cov=agents --cov=observability --cov=mlops
 ```
@@ -352,22 +362,26 @@ pytest --cov=agents --cov=observability --cov=mlops
 ## Getting Started
 Install
 ```bash
+bash
 
 pip install -r requirements.txt'
 ```
 Run API
 ```bash
+bash
 
 uvicorn api:app --reload
 ```
 Load Data
 ```bash
+bash
 
 python mlops/load_clean_csv_to_sql.py
 ```
 
 Start CDC Worker
 ```bash
+bash
 
 python mlops/cdc_retrain_worker.py
 ```
