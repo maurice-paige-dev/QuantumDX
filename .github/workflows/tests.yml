@@ -1,25 +1,89 @@
-name: tests
+name: QuantumDX Tests
 
 on:
   push:
+    branches: [ main, develop ]
   pull_request:
+    branches: [ main, develop ]
 
 jobs:
   test:
+    name: Run Tests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    env:
+      # Prevent external dependencies during tests
+      APP_ENV: test
+      FEATURE_STORE_MODE: parquet
+      FEATURE_STORE_PATH: /tmp/feature_store
+      VAULT_ADDR: ""
+      VAULT_TOKEN: ""
+      OTEL_SERVICE_NAME: quantumdx-test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      # Install core dependencies
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      # Install test + observability deps explicitly (safe guard)
+      - name: Install test dependencies
+        run: |
+          pip install pytest pytest-cov pytest-mock httpx
+          pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-prometheus opentelemetry-instrumentation-fastapi
+          pip install pandas pyarrow
+
+      # Optional: lint (can remove if not needed)
+      - name: Lint (optional)
+        continue-on-error: true
+        run: |
+          pip install ruff
+          ruff check .
+
+      # Run tests with coverage
+      - name: Run pytest
+        run: |
+          pytest --cov=agents \
+                 --cov=observability \
+                 --cov=mlops \
+                 --cov=streaming \
+                 --cov-report=term \
+                 --cov-report=xml
+
+      # Upload coverage report (for Codecov or artifacts)
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+
+  # Optional job: dependency check
+  security:
+    name: Dependency Security Scan
+    runs-on: ubuntu-latest
+    continue-on-error: true
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+      - name: Install pip-audit
+        run: pip install pip-audit
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest fastapi httpx pandas
-          pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-prometheus opentelemetry-instrumentation-fastapi
-
-      - name: Run tests
-        run: pytest
+      - name: Run security audit
+        run: pip-audit
