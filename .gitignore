@@ -29,3 +29,8 @@ node_modules/
 
 # Data (regenerated at runtime)
 data/patients.csv
+
+
+# Added by cargo
+
+/target

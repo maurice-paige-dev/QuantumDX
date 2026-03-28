@@ -32,14 +32,14 @@ class QuantumDxPipeline:
         self.diagnose_agent = DiagnosisAgent()
 
     @monitored("QuantumDxPipeline", "add_patient")
-    def add_patient(self, patient, trace_id: str | None = None):
+    def add_patient(self, patient: dict, trace_id: str | None = None):
         trace_id = trace_id or str(uuid.uuid4())
         try:
             r1 = self.ingest.ingest(patient)
             if not r1.ok:
                 return r1
 
-            r2 = self.validate.validate(r1.payload)
+            r2 = self.validate.validate(patient)
             if not r2.ok:
                 return r2
 
@@ -114,7 +114,7 @@ class QuantumDxPipeline:
             return AgentResult(False, f"Pipeline retrain failed: {exc}")
 
     @monitored("QuantumDxPipeline", "diagnose_patient")
-    def diagnose_patient(self, patient, trace_id: str | None = None):
+    def diagnose_patient(self, patient: dict, trace_id: str | None = None):
         try:
             r1 = self.validate.validate(patient)
             if not r1.ok:

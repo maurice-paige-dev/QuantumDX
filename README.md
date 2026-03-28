@@ -225,12 +225,14 @@ Features include:
 Automatically retrains when enough labeled data arrives:
 
 ```text
+
 New labeled records ≥ threshold → retrain()
 ```
 
 Run:
 
 ```bash
+bash
 python mlops/cdc_retrain_worker.py
 ```
 
@@ -266,6 +268,7 @@ Features
 	•	Deduplication (patient_id + clinic_id)
 
 ```bash
+bash
 
 FEATURE_STORE_MODE=delta
 FEATURE_STORE_PATH=data/feature_store
@@ -332,6 +335,7 @@ pytest
 ```
 Coverage:
 ```bash
+bash
 
 pytest --cov=agents --cov=observability --cov=mlops
 ```
@@ -357,17 +361,20 @@ pip install -r requirements.txt'
 ```
 Run API
 ```bash
+bash
 
 uvicorn api:app --reload
 ```
 Load Data
 ```bash
+bash
 
 python mlops/load_clean_csv_to_sql.py
 ```
 
 Start CDC Worker
 ```bash
+bash
 
 python mlops/cdc_retrain_worker.py
 ```
