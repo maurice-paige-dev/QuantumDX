@@ -1,10 +1,10 @@
-from base import AgentResult
+from .base import AgentResult
 from quantum_engine import encode_16q
 
 
 class EncodingAgent:
     @staticmethod
-    def encode(self, patient: dict) -> AgentResult:
+    def encode(patient: dict[str, any]) -> AgentResult:
         encoded = encode_16q(patient)
         return AgentResult(
             True,

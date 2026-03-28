@@ -1,5 +1,5 @@
 from aggregator import FederatedAggregator
-from base import AgentResult
+from .base import AgentResult
 
 
 class FederatedAgent:

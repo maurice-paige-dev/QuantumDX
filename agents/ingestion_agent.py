@@ -1,4 +1,4 @@
-from base import AgentResult
+from .base import AgentResult
 
 class IngestionAgent:
     @staticmethod
