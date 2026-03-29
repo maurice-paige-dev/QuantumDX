@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 import pandas as pd
-from base import AgentResult
+from .base import AgentResult
 
 
 class FeatureStoreAgent:

@@ -233,7 +233,6 @@ Run:
 
 ```bash
 bash
-
 python mlops/cdc_retrain_worker.py
 ```
 

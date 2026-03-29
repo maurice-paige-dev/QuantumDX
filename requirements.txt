@@ -17,4 +17,7 @@ hvac
 pyodbc
 azure-core
 confluent-kafka
+opentelemetry-api
+opentelemetry-sdk
+opentelemetry-exporter-prometheus
 opentelemetry-instrumentation-openai

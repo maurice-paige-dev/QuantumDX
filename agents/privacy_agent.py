@@ -1,10 +1,10 @@
 from datetime import datetime
-from base import AgentResult
+from .base import AgentResult
 
 
 class PrivacyAgent:
     @staticmethod
-    def redact(self, patient, encoded) -> AgentResult:
+    def redact(patient, encoded) -> AgentResult:
         return AgentResult(True, "Raw data removed", {
             "patient_id": patient["patient_id"],
             "clinic_id": patient.get("clinic_id", "default"),

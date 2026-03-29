@@ -1,4 +1,4 @@
-from base import AgentResult
+from .base import AgentResult
 
 SYMPTOM_COLS = [
     "fever","muscle_pain","jaundice","vomiting","confusion","headache",
@@ -18,7 +18,7 @@ REQUIRED_COLS = [
 
 class ValidationAgent:
     @staticmethod
-    def validate(self, patient: dict) -> AgentResult:
+    def validate(patient: dict[str, any]) -> AgentResult:
         cleaned = dict(patient)
 
         for col in REQUIRED_COLS:
