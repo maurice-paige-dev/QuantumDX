@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quantumdx-feature-store-worker
+  namespace: quantumdx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quantumdx-feature-store-worker
+  template:
+    metadata:
+      labels:
+        app: quantumdx-feature-store-worker
+    spec:
+      containers:
+      - name: worker
+        image: quantumdx/api:latest
+        command: ["python", "-m", "workers.run_worker", "feature-store"]
+        envFrom:
+        - configMapRef: {name: quantumdx-config}
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: quantumdx-data

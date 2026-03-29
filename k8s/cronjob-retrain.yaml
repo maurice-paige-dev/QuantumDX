@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: quantumdx-retrain-trigger
+  namespace: quantumdx
+spec:
+  schedule: "*/15 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: retrain
+              image: quantumdx/api:latest
+              imagePullPolicy: IfNotPresent
+              command: ["python", "-c", "from services.container import build_container; build_container().retrain_service.request_retrain({'min_accuracy':0.75})"]
+              envFrom:
+                - configMapRef:
+                    name: quantumdx-config
+                - secretRef:
+                    name: quantumdx-secrets
+              volumeMounts:
+                - name: data
+                  mountPath: /data
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: quantumdx-data

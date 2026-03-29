@@ -1,0 +1,15 @@
+resources:
+- namespace.yaml
+- pvc.yaml
+- configmap.yaml
+- kafka.yaml
+- api-deployment.yaml
+- api-service.yaml
+- worker-validation.yaml
+- worker-encoding.yaml
+- worker-privacy.yaml
+- worker-feature-store.yaml
+- worker-training.yaml
+- worker-federated.yaml
+- worker-evaluation.yaml
+- worker-registry.yaml

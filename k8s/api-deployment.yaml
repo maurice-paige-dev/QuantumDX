@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quantumdx-api
+  namespace: quantumdx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: quantumdx-api
+  template:
+    metadata:
+      labels:
+        app: quantumdx-api
+    spec:
+      containers:
+      - name: api
+        image: quantumdx/api:latest
+        command: ["uvicorn", "api.app:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef: {name: quantumdx-config}
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: quantumdx-data

@@ -1,29 +1,20 @@
-import joblib
-from datetime import datetime, timezone
-from pathlib import Path
+import pathlib
+import json
+from utils.config import model_registry_path
 from .base import AgentResult
 
-
 class RegistryAgent:
+    def __init__(self, path: str | None = None):
+        self.path = pathlib.Path(path or model_registry_path())
+        self.path.parent.mkdir(parents=True, exist_ok=True)
 
-    def __init__(self):
-        self.dir = Path("models")
-        self.dir.mkdir(exist_ok=True)
+    def promote(self, payload: dict) -> AgentResult:
+        with self.path.open("w", encoding="utf-8") as f:
+            json.dump(payload, f, indent=2)
+        return AgentResult(True, "Model promoted", payload)
 
-    def save(self, model, metrics):
-        ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-
-        obj = {"model": model, "metrics": metrics}
-
-        path = self.dir / f"model_{ts}.pkl"
-        joblib.dump(obj, path)
-
-        joblib.dump(obj, self.dir / "production.pkl")
-
-        return AgentResult(True, "Saved", {"version": ts})
-
-    def load_production(self):
-        path = self.dir / "production.pkl"
-        if not path.exists():
-            return None
-        return joblib.load(path)
+    def current_model(self) -> dict:
+        if not self.path.exists():
+            return {"model_version": "bootstrap_reference", "model_type": "fallback", "weights": None, "intercept": None}
+        with self.path.open("r", encoding="utf-8") as f:
+            return json.load(f)
