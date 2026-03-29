@@ -245,11 +245,15 @@ Supports real-time pipelines:
 Kafka
 
 ```bash
+bash
+
 python streaming/kafka_patient_consumer.py
 ```
 
 Azure Event Hub
 ```bash
+bash
+
 python streaming/eventhub_patient_consumer.py
 ```
 
@@ -330,6 +334,7 @@ scrape_configs:
 
 Run all tests:
 ```bash
+bash 
 
 pytest
 ```
@@ -356,6 +361,7 @@ pytest --cov=agents --cov=observability --cov=mlops
 ## Getting Started
 Install
 ```bash
+bash
 
 pip install -r requirements.txt'
 ```
