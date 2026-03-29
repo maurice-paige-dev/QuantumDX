@@ -1,13 +1,8 @@
+from core.quantum_engine import encode_16q
 from .base import AgentResult
-from quantum_engine import encode_16q
-
 
 class EncodingAgent:
     @staticmethod
-    def encode(patient: dict[str, any]) -> AgentResult:
-        encoded = encode_16q(patient)
-        return AgentResult(
-            True,
-            "Encoded with quantum_engine.encode_16q",
-            {"encoded_vector": encoded.tolist()}
-        )
+    def encode(self, payload: dict) -> AgentResult:
+        encoded_vector = encode_16q(payload).astype(float).tolist()
+        return AgentResult(True, "Patient encoded", {**payload, "encoded_vector": encoded_vector})

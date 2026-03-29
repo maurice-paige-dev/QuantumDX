@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: quantumdx-config
+  namespace: quantumdx
+data:
+  APP_ENV: "prod"
+  FEATURE_STORE_MODE: "parquet"
+  FEATURE_STORE_PATH: "/data/feature_store"
+  MODEL_REGISTRY_PATH: "/data/current_model.json"
+  LOG_LEVEL: "INFO"
+  OTEL_SERVICE_NAME: "quantumdx-api"
+  EVENT_BUS_MODE: "kafka"
+  KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+  KAFKA_GROUP_PREFIX: "quantumdx"

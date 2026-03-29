@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quantumdx-encoding-worker
+  namespace: quantumdx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quantumdx-encoding-worker
+  template:
+    metadata:
+      labels:
+        app: quantumdx-encoding-worker
+    spec:
+      containers:
+        - name: worker
+          image: quantumdx/api:latest
+          command: ["python", "-m", "workers.run_worker", "encoding"]
+          envFrom:
+            - configMapRef:
+                name: quantumdx-config
+            - secretRef:
+                name: quantumdx-secrets
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: quantumdx-data

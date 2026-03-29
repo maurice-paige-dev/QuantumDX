@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quantumdx-validation-worker
+  namespace: quantumdx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quantumdx-validation-worker
+  template:
+    metadata:
+      labels:
+        app: quantumdx-validation-worker
+    spec:
+      containers:
+        - name: worker
+          image: quantumdx/api:latest
+          imagePullPolicy: IfNotPresent
+          command: ["python", "-m", "workers.run_worker", "validation"]
+          envFrom:
+            - configMapRef:
+                name: quantumdx-config
+            - secretRef:
+                name: quantumdx-secrets
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: quantumdx-data

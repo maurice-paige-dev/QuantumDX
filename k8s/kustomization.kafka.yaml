@@ -1,0 +1,18 @@
+resources:
+  - namespace.yaml
+  - configmap.kafka.yaml
+  - secret-template.yaml
+  - pvc.yaml
+  - kafka.yaml
+  - api-deployment.yaml
+  - api-service.yaml
+  - worker-validation.kafka.yaml
+  - worker-encoding.kafka.yaml
+  - worker-privacy.kafka.yaml
+  - worker-feature-store.kafka.yaml
+  - worker-training.kafka.yaml
+  - worker-federated.kafka.yaml
+  - worker-evaluation.kafka.yaml
+  - worker-registry.kafka.yaml
+  - ingress.yaml
+  - cronjob-retrain.yaml

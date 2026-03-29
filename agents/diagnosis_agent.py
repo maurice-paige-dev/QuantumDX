@@ -1,30 +1,33 @@
-import joblib
-import numpy as np
+import math
+from core.quantum_engine import bootstrap_svm_reference, predict_quantum_svm
 from .base import AgentResult
-from quantum_engine import predict_quantum_svm, bootstrap_svm_reference
-
 
 class DiagnosisAgent:
-
     def __init__(self):
-        self.model_path = "models/production.pkl"
+        self._fallback_model = None
 
-    def diagnose(self, patient, encoded):
+    def _fallback(self):
+        if self._fallback_model is None:
+            self._fallback_model = bootstrap_svm_reference()
+        return self._fallback_model
 
-        try:
-            model = joblib.load(self.model_path)
-            w = np.array(model["model"]["weights"])
-            b = model["model"]["intercept"]
-
-            x = np.array(encoded)
-
-            prob = 1 / (1 + np.exp(-(x @ w + b)))
-
-        except:
-            m = bootstrap_svm_reference()
-            prob = predict_quantum_svm(patient, m)
-
-        return AgentResult(True, "Diagnosed", {
-            "probability": float(prob),
-            "diagnosis": int(prob > 0.5)
+    def diagnose(self, payload: dict) -> AgentResult:
+        model = payload.get("model") or {}
+        if model.get("weights") is not None and model.get("intercept") is not None:
+            score = sum(v * w for v, w in zip(payload["encoded_vector"], model["weights"])) + model["intercept"]
+            probability = 1.0 / (1.0 + math.exp(-score))
+            diagnosis = 1 if probability >= 0.5 else 0
+            return AgentResult(True, "Diagnosis completed", {
+                "diagnosis": diagnosis,
+                "probability": probability,
+                "model_type": model.get("model_type", "federated_linear_boundary"),
+                "model_version": model.get("model_version", "v2-promoted"),
+            })
+        probability = float(predict_quantum_svm(payload, self._fallback()))
+        diagnosis = 1 if probability >= 0.5 else 0
+        return AgentResult(True, "Diagnosis completed", {
+            "diagnosis": diagnosis,
+            "probability": probability,
+            "model_type": "fallback_quantum",
+            "model_version": "bootstrap_reference",
         })
